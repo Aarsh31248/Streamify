@@ -28,8 +28,8 @@ export async function signup(req, res) {
         .json({ message: "Email already exists, please use a different one" });
     }
 
-    const idx = Math.floor(Math.random() * 100) + 1; // generate a num between 1-100
-    const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
+    const seed = email;
+    const randomAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
 
     const newUser = await User.create({
       email,
@@ -114,9 +114,16 @@ export async function onboard(req, res) {
   try {
     const userId = req.user._id;
 
-    const { fullName, bio, nativeLanguage, learningLanguage, location } = req.body;
+    const { fullName, bio, nativeLanguage, learningLanguage, location } =
+      req.body;
 
-    if (!fullName || !bio || !nativeLanguage || !learningLanguage || !location) {
+    if (
+      !fullName ||
+      !bio ||
+      !nativeLanguage ||
+      !learningLanguage ||
+      !location
+    ) {
       return res.status(400).json({
         message: "All fields are required",
         missingFields: [
@@ -135,10 +142,11 @@ export async function onboard(req, res) {
         ...req.body,
         isOnboarded: true,
       },
-      { new: true }
+      { new: true },
     );
 
-    if (!updatedUser) return res.status(404).json({ message: "User not found" });
+    if (!updatedUser)
+      return res.status(404).json({ message: "User not found" });
 
     try {
       await upsertStreamUser({
@@ -146,9 +154,14 @@ export async function onboard(req, res) {
         name: updatedUser.fullName,
         image: updatedUser.profilePic || "",
       });
-      console.log(`Stream user updated after onboarding for ${updatedUser.fullName}`);
+      console.log(
+        `Stream user updated after onboarding for ${updatedUser.fullName}`,
+      );
     } catch (streamError) {
-      console.log("Error updating Stream user during onboarding:", streamError.message);
+      console.log(
+        "Error updating Stream user during onboarding:",
+        streamError.message,
+      );
     }
 
     res.status(200).json({ success: true, user: updatedUser });
@@ -156,4 +169,4 @@ export async function onboard(req, res) {
     console.error("Onboarding error:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
-} 
+}
