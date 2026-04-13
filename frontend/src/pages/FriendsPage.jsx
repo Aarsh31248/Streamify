@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import FriendCard from "../components/FriendCard";
 import { getUserFriends } from "../lib/api";
+import PageLoader from "../components/PageLoader";
 
 const FriendsPage = () => {
   const [friends, setFriends] = useState([]);
@@ -21,7 +22,7 @@ const FriendsPage = () => {
     fetchFriends();
   }, []);
 
-  if (loading) return <p className="p-6">Loading friends...</p>;
+  if (loading) return <p className="p-6"><PageLoader /></p>;
 
   return (
     <div className="p-6">
